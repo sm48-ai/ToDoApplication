@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.todo.models.Task;
 import com.todo.services.TaskService;
@@ -21,7 +23,6 @@ import com.todo.services.TaskService;
 public class TaskController {
     
     
-    @Autowired 
     private final TaskService taskService;
 
     public TaskController(TaskService taskService){
@@ -49,13 +50,14 @@ public class TaskController {
         return "redirect:/tasks";
     }
 
-     @DeleteMapping ("/{id}/toggle") 
-    public String toggleTasks(@PathVariable  Long id){
-        taskService.toggleTask(id);
-        
-        return "redirect:/tasks";
-    }
+   @PutMapping("/{id}/toggle")
+@ResponseBody
+public String toggleTasks(@PathVariable Long id) {
+
+    taskService.toggleTask(id);
+
+    return "success";
+}
 
     
-
 }

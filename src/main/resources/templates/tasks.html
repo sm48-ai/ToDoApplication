@@ -1,44 +1,297 @@
 ```html
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <title>Task List</title>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My To-Do List</title>
+
+
+    <!-- Bootstrap CSS -->
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+
+    <!-- Bootstrap Icons -->
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+    <!-- Our Custom CSS -->
+
+    <link rel="stylesheet"
+          th:href="@{/css/tasks.css}">
+
 </head>
+
 
 <body>
 
-    <h1>My To-Do List</h1>
 
-        <form action="/tasks" method="post">
-        <label>Task Title:</label>
-        <div>
-        <input type="text" name="title" placeholder="Enter task" required>
-        </div>
-        <br><br>
+<div class="container main-container">
 
-        <label>Completed:</label>
-        <input type="checkbox" name="completed">
-        <br><br>
 
-        <input type="submit" value="Add Task">
-    </form>
+    <!-- ================= HEADER ================= -->
 
-    <div>
-        <th:block th:each="task : ${tasks}">
-            <div>
-                <span th:text="${task.title}">Task Title</span>
-            </div>
+    <div class="header-card text-center">
 
-        </th:block>
+        <i class="bi bi-check2-circle fs-1"></i>
+
+        <h1 class="mt-2">
+            My To-Do List
+        </h1>
+
+        <p class="mb-0">
+            Organize your tasks and get things done!
+        </p>
+
     </div>
 
-    <h2>Add Task</h2>
+
+
+    <!-- ================= ADD TASK ================= -->
+
+    <div class="card add-card">
+
+        <div class="card-body p-4">
+
+            <h4 class="mb-3">
+
+                <i class="bi bi-plus-circle text-primary"></i>
+
+                Add New Task
+
+            </h4>
+
+
+            <form th:action="@{/tasks}"
+                  method="post">
+
+                <div class="input-group">
+
+                    <input type="text"
+                           name="title"
+                           class="form-control form-control-lg"
+                           placeholder="Enter your task..."
+                           required>
+
+
+                    <button type="submit"
+                            class="btn btn-primary btn-lg">
+
+                        <i class="bi bi-plus-lg"></i>
+
+                        Add Task
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 
 
- 
+    <!-- ================= TASK LIST ================= -->
+
+    <h3 class="section-title">
+
+        <i class="bi bi-list-check"></i>
+
+        Your Tasks
+
+    </h3>
+
+
+
+    <!-- ================= EMPTY TASK ================= -->
+
+    <div th:if="${#lists.isEmpty(tasks)}"
+         class="empty-box">
+
+        <i class="bi bi-clipboard-x fs-1 text-secondary"></i>
+
+        <h4 class="mt-3">
+            No Tasks Found
+        </h4>
+
+        <p class="text-muted">
+            Start by adding your first task above.
+        </p>
+
+    </div>
+
+
+
+    <!-- ================= TASK CARDS ================= -->
+
+    <div th:each="task : ${tasks}"
+         class="card task-card">
+
+
+        <div class="card-body d-flex justify-content-between align-items-center">
+
+
+            <!-- TASK INFORMATION -->
+
+            <div>
+
+                <!-- TASK TITLE -->
+
+                <span class="task-title"
+                      th:classappend="${task.completed} ? ' completed' : ''"
+                      th:text="${task.title}">
+
+                    Task Title
+
+                </span>
+
+
+                <br>
+
+
+                <!-- COMPLETED -->
+
+                <span th:if="${task.completed}"
+                      class="badge bg-success mt-2">
+
+                    <i class="bi bi-check-circle"></i>
+
+                    Completed
+
+                </span>
+
+
+                <!-- PENDING -->
+
+                <span th:unless="${task.completed}"
+                      class="badge bg-warning text-dark mt-2">
+
+                    <i class="bi bi-hourglass-split"></i>
+
+                    Pending
+
+                </span>
+
+            </div>
+
+
+
+            <!-- ================= ACTION BUTTONS ================= -->
+
+            <div class="task-actions d-flex gap-2">
+
+
+                <!-- TOGGLE BUTTON -->
+
+                <button type="button"
+                        class="btn btn-outline-success btn-sm"
+                        th:onclick="'toggleTask(' + ${task.id} + ')'">
+
+                    <i class="bi bi-check2"></i>
+
+
+                    <span th:if="${task.completed}">
+                        Undo
+                    </span>
+
+
+                    <span th:unless="${task.completed}">
+                        Complete
+                    </span>
+
+                </button>
+
+
+
+                <!-- DELETE BUTTON -->
+
+                <a th:href="@{/tasks/{id}/delete(id=${task.id})}"
+                   class="btn btn-outline-danger btn-sm"
+                   onclick="return confirm('Are you sure you want to delete this task?');">
+
+                    <i class="bi bi-trash"></i>
+
+                    Delete
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+    function toggleTask(id) {
+
+        fetch('/tasks/' + id + '/toggle', {
+
+            method: 'PUT'
+
+        })
+
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "HTTP Error: " + response.status
+                );
+
+            }
+
+            return response.text();
+
+        })
+
+        .then(data => {
+
+            console.log("Response:", data);
+
+            window.location.href = '/tasks';
+
+        })
+
+        .catch(error => {
+
+            console.error("Toggle error:", error);
+
+            alert("Unable to update task");
+
+        });
+
+    }
+
+</script>
+
+
+
+<!-- Bootstrap JavaScript -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+</script>
+
 
 </body>
+
 </html>
 ```
