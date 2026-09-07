@@ -1,0 +1,44 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <title>Task List</title>
+</head>
+
+<body>
+
+    <h1>My To-Do List</h1>
+
+        <form action="/tasks" method="post">
+        <label>Task Title:</label>
+        <div>
+        <input type="text" name="title" placeholder="Enter task" required>
+        </div>
+        <br><br>
+
+        <label>Completed:</label>
+        <input type="checkbox" name="completed">
+        <br><br>
+
+        <input type="submit" value="Add Task">
+    </form>
+
+    <div>
+        <th:block th:each="task : ${tasks}">
+            <div>
+                <span th:text="${task.title}">Task Title</span>
+            </div>
+
+        </th:block>
+    </div>
+
+    <h2>Add Task</h2>
+
+
+
+ 
+
+</body>
+</html>
+```
